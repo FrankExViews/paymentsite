@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib import messages #import for messages
 from .forms import UserRegisterForm  #Import added
+from django.shortcuts import redirect
 
 # Create your views here.
 
