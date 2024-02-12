@@ -1,0 +1,33 @@
+{% extends "storefront/base.html" %}
+{% block content %}
+        
+        {% load mathfilters %}
+        {% load static %}
+
+        <div class="container">
+        <div class="row row-cols-1">
+
+       {% for product in allproductsupdated %}
+       <div class="col-lg-6">
+       {% if product.active == True %}
+       <div class="card h-100" style="width: 32rem;">
+       <p>{{product.name}}<br><br>
+    {{product.description}}</p>
+       {%endif%}
+       {% for key,value in producturls.items %}
+       {%if key in product.id%}
+       <img src="{{value}}"  class="img-fluid" alt="{{product.name}}">
+       {%endif%}
+       {%endfor%}
+       {% for price in allprices %}
+     {%if price.id == product.default_price%}
+     <p>PRICE:{{price.unit_amount|div:100|floatformat:2}}:{{price.currency}}</p>
+    </div>
+    </div>
+     {%endif%}
+     {%endfor%}
+     {% endfor %}
+    
+    </div>
+    </div>
+     {% endblock content %}

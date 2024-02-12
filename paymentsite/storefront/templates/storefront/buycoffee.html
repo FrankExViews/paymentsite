@@ -1,0 +1,40 @@
+{% extends "storefront/base.html" %}
+{% block content %}
+{% load mathfilters %}
+{% load static %}
+        
+   <div class="container">
+   <div class="row row-cols-1">
+   {% for product in allproductsupdated %}
+   {% if product.active == True%}
+   {% for key,value in product.metadata.items %}
+   {%if key == "coffee"%}
+   <div class="col-lg-6">
+      <div class="card h-100" style="width: 32rem;">
+       <p>{{product.name}}<br><br>
+       {{product.description}}</p>
+
+       {% for key,value in producturls.items %}
+       {%if key in product.id%}
+       <img src="{{value}}"  class="img-fluid" alt="{{product.name}}">
+       {%endif%}
+       {%endfor%}
+
+       {% for price in allprices %}
+     {%if price.id == product.default_price%}
+     <p>PRICE:{{price.unit_amount|div:100|floatformat:2}}:{{price.currency}}</p>
+     
+   </div>
+     </div>
+
+       {% endif %}
+       {% endfor %}
+
+       {% endif %}
+       {% endfor %}
+       {%endif%}
+       {% endfor %}
+</div>
+
+
+     {% endblock content %}
