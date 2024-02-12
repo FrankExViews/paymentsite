@@ -17,14 +17,14 @@
                   <div class="navbar-nav">
                     {% if user.is_authenticated %}
                     <a class="nav-item nav-link" href="{%url 'home'%}">Home</a>
-                    <a class="nav-item nav-link" href="">About</a>
+                    <a class="nav-item nav-link" href="{%url 'about'%}">About</a>
                     <a class="nav-item nav-link" href="{%url 'buycoffee'%}">Buy Coffee</a>
                     <a class="nav-item nav-link" href="{%url 'buyequipment'%}">Buy Equipment</a>
                     <a class="nav-item nav-link" href="{%url 'faq'%}">FAQs</a>
                     <a class="nav-item nav-link" href="">Logout</a>
                     {% else %}
                     <a class="nav-item nav-link" href="{%url 'home'%}">Home</a>
-                    <a class="nav-item nav-link" href="">About</a>
+                    <a class="nav-item nav-link" href="{%url 'about'%}">About</a>
                     <a class="nav-item nav-link" href="{%url 'buycoffee'%}">Buy Coffee</a>
                     <a class="nav-item nav-link" href="{%url 'buyequipment'%}">Buy Equipment</a>
                     <a class="nav-item nav-link" href="{%url 'faq'%}">FAQs</a>
@@ -53,17 +53,17 @@
                       <div class="navbar-nav">
                         {% if user.is_authenticated %}
                         <a class="nav-item nav-link" href="{%url 'home'%}">Home</a>
-                        <a class="nav-item nav-link" href="">About</a>
+                        <a class="nav-item nav-link" href="{%url 'about'%}">About</a>
                         <a class="nav-item nav-link" href="{%url 'buycoffee'%}">Buy Coffee</a>
                         <a class="nav-item nav-link" href="{%url 'buyequipment'%}">Buy Equipment</a>
-                        <a class="nav-item nav-link" href="">FAQs</a>
+                        <a class="nav-item nav-link" href="{%url 'faq'%}">FAQs</a>
                         <a class="nav-item nav-link" href="">Logout</a>
                         {% else %}
                         <a class="nav-item nav-link" href="{%url 'home'%}">Home</a>
-                        <a class="nav-item nav-link" href="">About</a>
+                        <a class="nav-item nav-link" href="{%url 'about'%}">About</a>
                         <a class="nav-item nav-link" href="{%url 'buycoffee'%}">Buy Coffee</a>
                         <a class="nav-item nav-link" href="{%url 'buyequipment'%}">Buy Equipment</a>
-                        <a class="nav-item nav-link" href="">FAQs</a>
+                        <a class="nav-item nav-link" href="{%url 'faq'%}">FAQs</a>
                         <a class="nav-item nav-link" href="{%url 'register'%}">Register</a>
                         {% endif %}
                       </div>

@@ -79,6 +79,9 @@ def buycoffee(request):
 def faq(request):
     return render(request,'storefront/faq.html',)
 
+def about(request):
+    return render(request,'storefront/about.html',)
+
 {
             
         }
