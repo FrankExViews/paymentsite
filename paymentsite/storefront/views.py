@@ -76,6 +76,8 @@ def buycoffee(request):
     allproductsupdated,allprices,producturls=getfreshupdates()
     return render(request,'storefront/buycoffee.html',{'allproductsupdated':allproductsupdated,'allprices':allprices,'producturls':producturls})
 
+def faq(request):
+    return render(request,'storefront/faq.html',)
 
 {
             
