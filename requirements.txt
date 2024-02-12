@@ -7,6 +7,7 @@ Django==4.2.9
 django-bootstrap-v5==1.0.11
 django-crispy-forms==2.1
 django-mathfilters==1.0.0
+gunicorn==21.2.0
 idna==3.6
 mailchimp-marketing==3.0.80
 mailchimp-transactional==1.0.50
