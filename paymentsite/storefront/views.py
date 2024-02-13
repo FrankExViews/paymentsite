@@ -52,6 +52,7 @@ message = {
     ]
 }
 
+
 def run():
  try:
     response = mailchimp.messages.send({"message":message})
