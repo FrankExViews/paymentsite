@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.conf import settings
 from stripe import stripe
 import re
+from .forms import BuyCoffeeNowForm
 
 # Create your views here.
 
