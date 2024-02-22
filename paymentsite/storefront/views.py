@@ -95,6 +95,7 @@ def buycoffee(request):
             ],
             mode='payment',
             billing_address_collection='required',
+            shipping_address_collection={"allowed_countries":['IE']},
             success_url='https://retailsiteweb.onrender.com/',
             cancel_url='https://retailsiteweb.onrender.com/',
         )
