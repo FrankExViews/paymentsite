@@ -90,9 +90,11 @@ def buycoffee(request):
                     # Provide the exact Price ID (for example, pr_1234) of the product you want to sell
                     'price': PRICE_ID,
                     'quantity': 1,
+                    'adjustable_quantity':{'enabled':True},
                 },
             ],
             mode='payment',
+            billing_address_collection='required',
             success_url='https://retailsiteweb.onrender.com/',
             cancel_url='https://retailsiteweb.onrender.com/',
         )
