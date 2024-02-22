@@ -23,7 +23,11 @@
        {% for price in allprices %}
      {%if price.id == product.default_price%}
      <p>PRICE:{{price.unit_amount|div:100|floatformat:2}}:{{price.currency}}</p>
-     
+     <form method="post">
+      {% csrf_token %}
+      <input type="hidden" id="CoffeeProdID" name="CoffeeProdID" value="{{product.id}}">
+      <input type="submit" value="BUY NOW!">
+     </form>
    </div>
      </div>
 

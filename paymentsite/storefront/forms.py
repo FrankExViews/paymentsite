@@ -1,4 +1,5 @@
 from django import forms
 
 class BuyCoffeeNowForm(forms.Form):
-    CoffeeProdid = forms.HiddenInput
+    CoffeeProdID = forms.CharField()
+    CoffeePriceID =forms.CharField()
