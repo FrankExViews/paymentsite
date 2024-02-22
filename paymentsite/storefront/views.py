@@ -90,7 +90,7 @@ def buycoffee(request):
                     # Provide the exact Price ID (for example, pr_1234) of the product you want to sell
                     'price': PRICE_ID,
                     'quantity': 1,
-                    'adjustable_quantity':{'enabled':True},
+                    'adjustable_quantity':{'enabled':True,"minimum": 1,},
                 },
             ],
             mode='payment',
