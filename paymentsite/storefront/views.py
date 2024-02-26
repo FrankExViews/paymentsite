@@ -72,6 +72,31 @@ def home(request):
 
 def buyequipment(request):
     allproductsupdated,allprices,producturls=getfreshupdates()
+
+    if request.method == 'POST':
+        form = BuyCoffeeNowForm(request.POST)
+        if form.is_valid():
+            Product_ID=form.cleaned_data.get('CoffeeProdID')
+            PRICE_ID=form.cleaned_data.get('CoffeePriceID')
+            print(Product_ID)
+            print(PRICE_ID)
+            checkout_session = stripe.checkout.Session.create(
+            line_items=[
+                {
+                    # Provide the exact Price ID (for example, pr_1234) of the product you want to sell
+                    'price': PRICE_ID,
+                    'quantity': 1,
+                    'adjustable_quantity':{'enabled':True,"minimum": 1,},
+                },
+            ],
+            mode='payment',
+            billing_address_collection='required',
+            shipping_address_collection={"allowed_countries":['IE']},
+            success_url='https://retailsiteweb.onrender.com/',
+            cancel_url='https://retailsiteweb.onrender.com/',
+        )
+            return redirect(checkout_session.url, code=303)
+
     return render(request,'storefront/buyequipment.html',{'allproductsupdated':allproductsupdated,'allprices':allprices,'producturls':producturls})
 
 def buycoffee(request):
