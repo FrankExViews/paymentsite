@@ -17,7 +17,7 @@ webhook=settings.WEBHOOK
 
 #create a webhook from Stripe API to Render webhook. 
 endpoint = stripe.WebhookEndpoint.create(
-  url='https://api.render.com/deploy/srv-cn51vsmn7f5s7394baig?',
+  url='https://api.render.com/deploy/srv-cn51vsmn7f5s7394baig?key=8kOv_I__8sU',
   enabled_events=[
     'payment_intent.payment_failed',
     'payment_intent.succeeded',
@@ -43,7 +43,6 @@ def my_webhook_view(request):
     payment_intent = event.data.object # contains a stripe.PaymentIntent
     # Then define and call a method to handle the successful payment intent.
     # handle_payment_intent_succeeded(payment_intent)
-    print('payment recevied')
   elif event.type == 'payment_method.attached':
     payment_method = event.data.object # contains a stripe.PaymentMethod
     # Then define and call a method to handle the successful attachment of a PaymentMethod.
