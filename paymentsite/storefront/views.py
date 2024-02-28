@@ -1,7 +1,10 @@
 from django.shortcuts import render,redirect
 from django.conf import settings
+from django.http import HttpResponse
+from django.views.decorators.csrf import csrf_exempt
 from stripe import stripe
 import re
+import json
 from .forms import BuyCoffeeNowForm
 
 # Create your views here.
@@ -9,7 +12,47 @@ from .forms import BuyCoffeeNowForm
 stripe.api_key=settings.STRIPE_PRIVATE_KEY
 mailchimpkey=settings.MAILCHIMP_API_KEY
 mailchimptransactionkey=settings.MAILCHIMP_API_TRANSACTION_KEY
+webhook=settings.WEBHOOK
 
+
+#create a webhook from Stripe API to Render webhook. 
+endpoint = stripe.WebhookEndpoint.create(
+  url='https://api.render.com/deploy/srv-cn51vsmn7f5s7394baig?',
+  enabled_events=[
+    'payment_intent.payment_failed',
+    'payment_intent.succeeded',
+  ],
+)
+
+#sample STRIPE WEBHOOK code to capture events
+@csrf_exempt
+def my_webhook_view(request):
+  payload = request.body
+  event = None
+
+  try:
+    event = stripe.Event.construct_from(
+      json.loads(payload), stripe.api_key
+    )
+  except ValueError as e:
+    # Invalid payload
+    return HttpResponse(status=400)
+
+  # Handle the event
+  if event.type == 'payment_intent.succeeded':
+    payment_intent = event.data.object # contains a stripe.PaymentIntent
+    # Then define and call a method to handle the successful payment intent.
+    # handle_payment_intent_succeeded(payment_intent)
+    print('payment recevied')
+  elif event.type == 'payment_method.attached':
+    payment_method = event.data.object # contains a stripe.PaymentMethod
+    # Then define and call a method to handle the successful attachment of a PaymentMethod.
+    # handle_payment_method_attached(payment_method)
+  # ... handle other event types
+  else:
+    print('Unhandled event type {}'.format(event.type))
+
+  return HttpResponse(status=200)
 
 # this function is run anytime you visit/refresh a 'buy coffee' or 'buy equipment' page
 # this is run each time to make sure the latest values,images etc.. for the products listed in Stripe, are returned by Stripe
@@ -80,6 +123,7 @@ def buyequipment(request):
             PRICE_ID=form.cleaned_data.get('CoffeePriceID')
             print(Product_ID)
             print(PRICE_ID)
+            print(webhook)
             checkout_session = stripe.checkout.Session.create(
             line_items=[
                 {
