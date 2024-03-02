@@ -9,3 +9,8 @@ class stripeorders(models.Model):
 
     def __str__(self):
         return self.stripe_order_num,self.stripe_order_username,self.stripe_ship_status,
+
+class stripshoppingcart(models.Model):
+    cart_item_username = models.CharField(max_length=50)
+    cart_item_priceid=models.CharField(max_length=50)
+    cart_item_qty=models.CharField(max_length=4)

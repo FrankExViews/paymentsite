@@ -23,14 +23,21 @@
        {% for price in allprices %}
      {%if price.id == product.default_price%}
      <p>PRICE:{{price.unit_amount|div:100|floatformat:2}}:{{price.currency}}</p>
-     
+     {% if not user.is_authenticated%}
      <form method="post">
       {% csrf_token %}
       <input type="hidden" id="CoffeeProdID" name="CoffeeProdID" value="{{product.id}}">
       <input type="hidden" id="CoffeePriceID" name="CoffeePriceID" value="{{price.id}}">
       <input type="submit" value="BUY NOW!">
      </form>
-
+{%endif%}
+{% if user.is_authenticated%}
+     <form method="post">
+      {% csrf_token %}
+      <input type="hidden" id="CartPriceID" name="CartPriceID" value="{{price.id}}">
+      <input type="submit" value="ADD TO CART!">
+     </form>
+     {%endif%}
     </div>
   </div>
 

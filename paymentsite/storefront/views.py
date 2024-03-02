@@ -5,7 +5,8 @@ from django.views.decorators.csrf import csrf_exempt
 from stripe import stripe
 import re
 import json
-from .forms import BuyCoffeeNowForm
+from .forms import BuyCoffeeNowForm,addtocart
+from storefront.models import stripeorders,stripshoppingcart
 
 # Create your views here.
 
@@ -16,13 +17,13 @@ webhook=settings.WEBHOOK
 
 
 #create a webhook from Stripe API to Render webhook. 
-endpoint = stripe.WebhookEndpoint.create(
-  url='https://api.render.com/deploy/srv-cn51vsmn7f5s7394baig?key=8kOv_I__8sU',
-  enabled_events=[
-    'payment_intent.payment_failed',
-    'payment_intent.succeeded',
-  ],
-)
+#endpoint = stripe.WebhookEndpoint.create(
+ # url='https://api.render.com/deploy/srv-cn51vsmn7f5s7394baig?key=8kOv_I__8sU',
+  #enabled_events=[
+   # 'payment_intent.payment_failed',
+    #'payment_intent.succeeded',
+  #],
+#)
 
 #sample STRIPE WEBHOOK code to capture events
 @csrf_exempt
@@ -123,15 +124,15 @@ def buyequipment(request):
             print(Product_ID)
             print(PRICE_ID)
             print(webhook)
-            checkout_session = stripe.checkout.Session.create(
-            line_items=[
-                {
+            cart=[{
                     # Provide the exact Price ID (for example, pr_1234) of the product you want to sell
                     'price': PRICE_ID,
                     'quantity': 1,
                     'adjustable_quantity':{'enabled':True,"minimum": 1,},
-                },
-            ],
+                }]
+            print(cart)
+            checkout_session = stripe.checkout.Session.create(
+            line_items=cart,
             mode='payment',
             billing_address_collection='required',
             shipping_address_collection={"allowed_countries":['IE']},
@@ -146,8 +147,9 @@ def buycoffee(request):
     allproductsupdated,allprices,producturls=getfreshupdates()
 
     if request.method == 'POST':
-        form = BuyCoffeeNowForm(request.POST)
-        if form.is_valid():
+        if 'CoffeeProdID' in request.POST:
+          form = BuyCoffeeNowForm(request.POST)
+          if form.is_valid():
             Product_ID=form.cleaned_data.get('CoffeeProdID')
             PRICE_ID=form.cleaned_data.get('CoffeePriceID')
             print(Product_ID)
@@ -166,8 +168,18 @@ def buycoffee(request):
             shipping_address_collection={"allowed_countries":['IE']},
             success_url='https://retailsiteweb.onrender.com/',
             cancel_url='https://retailsiteweb.onrender.com/',
-        )
+            )
             return redirect(checkout_session.url, code=303)
+        if 'CartPriceID' in request.POST:
+           form = addtocart(request.POST)
+           if form.is_valid():
+            PRICE_ID=form.cleaned_data.get('CartPriceID')
+            user=request.user.username
+            newcartitem=stripshoppingcart(cart_item_username=user,cart_item_priceid=PRICE_ID, cart_item_qty=1)
+            newcartitem.save()
+
+
+           return render(request,'storefront/cart.html')  
     return render(request,'storefront/buycoffee.html',{'allproductsupdated':allproductsupdated,'allprices':allprices,'producturls':producturls})
 
 def faq(request):
