@@ -3,7 +3,34 @@
         
         {% load mathfilters %}
         {% load static %}
-
-      CART!!!!!!!
+      <div class="container">
+        <table class="table">
+    {% for items in allcartitems%}
+    {% for product in allproductsupdated %}
+    {%if items.price == product.default_price %}
+    <tr>
+    <td>{{product.name}}</td>
+    <td>{{product.quantity}}</td>
+    <td>{{items.price}}</td>
+    </tr>
+    {%endif%}
+    {%endfor%}
+    {%endfor%}
+        </table>
     
+
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" id="Delete Cart" name="Delete Cart" value="Delete Cart">
+        <input type="submit" value="Delete Cart">
+       </form>
+
+    {% if allcartitems%} 
+    <form method="post">
+        {% csrf_token %}
+        <input type="hidden" id="Checkout" name="Checkout" value="Checkout">
+        <input type="submit" value="Checkout">
+       </form>
+    </div>
+    {%endif%}
      {% endblock content %}

@@ -6,7 +6,7 @@ from stripe import stripe
 import re
 import json
 from .forms import BuyCoffeeNowForm,addtocart
-from storefront.models import stripeorders,stripshoppingcart
+from storefront.models import stripeorders,stripeshoppingcart
 
 # Create your views here.
 
@@ -83,11 +83,12 @@ def getfreshupdates():
 import mailchimp_transactional as MailchimpTransactional
 from mailchimp_transactional.api_client import ApiClientError
 
+#test mail to notify me of a server reboot and prove mail functionality works upon server reboot.
 mailchimp = MailchimpTransactional.Client(mailchimptransactionkey)
 message = {
     "from_email": "coffee@bigbootcoffee.com",
-    "subject": "Hello world",
-    "text": "Welcome to Mailchimp Transactional!",
+    "subject": "Server Started",
+    "text": "Server Started",
     "to": [
       {
         "email": "keithanolan@gmail.com",
@@ -117,13 +118,13 @@ def buyequipment(request):
     allproductsupdated,allprices,producturls=getfreshupdates()
 
     if request.method == 'POST':
-        form = BuyCoffeeNowForm(request.POST)
-        if form.is_valid():
+        #below is the "buy now" post to trigger a unlogged in users buy now purchase
+        if 'CoffeeProdID' in request.POST:
+          form = BuyCoffeeNowForm(request.POST)
+          if form.is_valid():
             Product_ID=form.cleaned_data.get('CoffeeProdID')
             PRICE_ID=form.cleaned_data.get('CoffeePriceID')
-            print(Product_ID)
-            print(PRICE_ID)
-            print(webhook)
+           #below Im testing if the cart can be specified as a variable, which it can.
             cart=[{
                     # Provide the exact Price ID (for example, pr_1234) of the product you want to sell
                     'price': PRICE_ID,
@@ -140,6 +141,18 @@ def buyequipment(request):
             cancel_url='https://retailsiteweb.onrender.com/',
         )
             return redirect(checkout_session.url, code=303)
+   #bewlow is the add product to cart option for a user that is logged in.
+    if 'CartPriceID' in request.POST:
+           form = addtocart(request.POST)
+           if form.is_valid():
+            PRICE_ID=form.cleaned_data.get('CartPriceID')
+            user=request.user.username
+            newcartitem=stripeshoppingcart(cart_item_username=user,price=PRICE_ID, quantity=1,)
+            newcartitem.save()
+            allcartitems=stripeshoppingcart.objects.filter(cart_item_username=user).values()
+            print(allcartitems)
+            allproductsupdated,allprices,producturls=getfreshupdates()
+            return redirect('/cart/',{'allcartitems':allcartitems,'allproductsupdated':allproductsupdated,'allprices':allprices,'producturls':producturls})
 
     return render(request,'storefront/buyequipment.html',{'allproductsupdated':allproductsupdated,'allprices':allprices,'producturls':producturls})
 
@@ -147,6 +160,7 @@ def buycoffee(request):
     allproductsupdated,allprices,producturls=getfreshupdates()
 
     if request.method == 'POST':
+        #below is the "buy now" post to trigger a unlogged in users buy now purchase
         if 'CoffeeProdID' in request.POST:
           form = BuyCoffeeNowForm(request.POST)
           if form.is_valid():
@@ -170,16 +184,18 @@ def buycoffee(request):
             cancel_url='https://retailsiteweb.onrender.com/',
             )
             return redirect(checkout_session.url, code=303)
+          #bewlow is the add product to cart option for a user that is logged in.
         if 'CartPriceID' in request.POST:
            form = addtocart(request.POST)
            if form.is_valid():
             PRICE_ID=form.cleaned_data.get('CartPriceID')
             user=request.user.username
-            newcartitem=stripshoppingcart(cart_item_username=user,cart_item_priceid=PRICE_ID, cart_item_qty=1)
+            newcartitem=stripeshoppingcart(cart_item_username=user,price=PRICE_ID, quantity=1)
             newcartitem.save()
-
-
-           return render(request,'storefront/cart.html')  
+            allcartitems=stripeshoppingcart.objects.filter(cart_item_username=user).values()
+            print(allcartitems)
+            allproductsupdated,allprices,producturls=getfreshupdates()
+            return redirect('/cart/',{'allcartitems':allcartitems,'allproductsupdated':allproductsupdated,'allprices':allprices,'producturls':producturls})  
     return render(request,'storefront/buycoffee.html',{'allproductsupdated':allproductsupdated,'allprices':allprices,'producturls':producturls})
 
 def faq(request):
@@ -188,6 +204,39 @@ def faq(request):
 def about(request):
     return render(request,'storefront/about.html',)
 
-{
-            
-        }
+#below is the view cart request, it will do a DB check to see if there are any items for the logged in user in the cart already.
+def cart(request):
+   user=request.user.username
+   allcartitems=stripeshoppingcart.objects.filter(cart_item_username=user).values()
+   print(allcartitems)
+   allproductsupdated,allprices,producturls=getfreshupdates()
+
+   if request.method == 'POST':
+    if 'Delete Cart' in request.POST:
+       user=request.user.username
+       stripeshoppingcart.objects.filter(cart_item_username=user).delete()
+       return render(request,'storefront/cart.html')
+  
+   if 'Checkout' in request.POST:
+       #collect all cart items in database and write them in JSON format to a variable json_data
+       allcartitems=stripeshoppingcart.objects.filter(cart_item_username=user).values('price','quantity')
+       json_data = json.dumps(list(allcartitems))
+       #in order to be able to correctly submit the json data stored in json_data, I use json.loads to create a new variable
+       #if this step is not performed, Stripe will give an "invalid array" error when attmepting to create a checkout session.
+       #while the content of json_data is correct and if you print out and use the contents in code, it will work.
+       #Stripe does not seem to pick up the contents of the json_data variable correctly.
+       #json.loads () to a new varialbe resovles the issue as the json data is storaed as a variable that Python handles correctly....   
+       test=json.loads(json_data)
+
+       checkout_session = stripe.checkout.Session.create(
+            line_items=test,
+            mode='payment',
+            billing_address_collection='required',
+            shipping_address_collection={"allowed_countries":['IE']},
+            success_url='https://retailsiteweb.onrender.com/',
+            cancel_url='https://retailsiteweb.onrender.com/',
+      )
+       return redirect(checkout_session.url, code=303)
+       
+
+   return render(request,'storefront/cart.html',{'allcartitems':allcartitems,'allproductsupdated':allproductsupdated,'allprices':allprices,'producturls':producturls})  
