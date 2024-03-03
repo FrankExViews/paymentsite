@@ -84,9 +84,9 @@ WSGI_APPLICATION = 'paymentsite.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'retail_8fc5',
-        'USER': 'retail_8fc5_user',
-        'PASSWORD': 'SPwS0MEIvxmiKM2TxJ55gBFPkd2W1Pyj',
+        'NAME': os.environ.get('RETAIL_DB_NAME'),
+        'USER': os.environ.get('RETAIL_DB_USER'),
+        'PASSWORD': os.environ.get('RETAIL_DB_PASSWORD'),
         'HOST': 'dpg-cmrnr9021fec739slpu0-a.frankfurt-postgres.render.com',
         'PORT': '5432',
     }
