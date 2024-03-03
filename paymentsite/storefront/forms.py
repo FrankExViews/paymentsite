@@ -6,3 +6,4 @@ class BuyCoffeeNowForm(forms.Form):
 
 class addtocart(forms.Form):
     CartPriceID =forms.CharField()
+    CartQuantity = forms.IntegerField()

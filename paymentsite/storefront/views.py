@@ -146,8 +146,9 @@ def buyequipment(request):
            form = addtocart(request.POST)
            if form.is_valid():
             PRICE_ID=form.cleaned_data.get('CartPriceID')
+            QTY=form.cleaned_data.get('quantity')
             user=request.user.username
-            newcartitem=stripeshoppingcart(cart_item_username=user,price=PRICE_ID, quantity=1,)
+            newcartitem=stripeshoppingcart(cart_item_username=user,price=PRICE_ID, quantity=QTY,)
             newcartitem.save()
             allcartitems=stripeshoppingcart.objects.filter(cart_item_username=user).values()
             print(allcartitems)
@@ -189,8 +190,10 @@ def buycoffee(request):
            form = addtocart(request.POST)
            if form.is_valid():
             PRICE_ID=form.cleaned_data.get('CartPriceID')
+            QTY=form.cleaned_data.get('CartQuantity')
+            print(QTY)
             user=request.user.username
-            newcartitem=stripeshoppingcart(cart_item_username=user,price=PRICE_ID, quantity=1)
+            newcartitem=stripeshoppingcart(cart_item_username=user,price=PRICE_ID, quantity=QTY)
             newcartitem.save()
             allcartitems=stripeshoppingcart.objects.filter(cart_item_username=user).values()
             print(allcartitems)

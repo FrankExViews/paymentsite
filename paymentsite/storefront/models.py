@@ -20,5 +20,5 @@ class stripeorders(models.Model):
 class stripeshoppingcart(models.Model):
     cart_item_username = models.CharField(max_length=50)
     price=models.CharField(max_length=50)
-    quantity=models.CharField(max_length=4)
+    quantity=models.IntegerField()
     adjustable_quantity=models.CharField(max_length=50)
