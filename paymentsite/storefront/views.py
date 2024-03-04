@@ -124,38 +124,41 @@ def buyequipment(request):
           if form.is_valid():
             Product_ID=form.cleaned_data.get('CoffeeProdID')
             PRICE_ID=form.cleaned_data.get('CoffeePriceID')
-           #below Im testing if the cart can be specified as a variable, which it can.
-            cart=[{
+            print(Product_ID)
+            print(PRICE_ID)
+            checkout_session = stripe.checkout.Session.create(
+            line_items=[
+                {
                     # Provide the exact Price ID (for example, pr_1234) of the product you want to sell
                     'price': PRICE_ID,
                     'quantity': 1,
                     'adjustable_quantity':{'enabled':True,"minimum": 1,},
-                }]
-            print(cart)
-            checkout_session = stripe.checkout.Session.create(
-            line_items=cart,
+                },
+            ],
             mode='payment',
             billing_address_collection='required',
             shipping_address_collection={"allowed_countries":['IE']},
             success_url='https://retailsiteweb.onrender.com/',
             cancel_url='https://retailsiteweb.onrender.com/',
-        )
+            )
             return redirect(checkout_session.url, code=303)
-   #bewlow is the add product to cart option for a user that is logged in.
-    if 'CartPriceID' in request.POST:
-           form = addtocart(request.POST)
-           if form.is_valid():
-            PRICE_ID=form.cleaned_data.get('CartPriceID')
-            QTY=form.cleaned_data.get('quantity')
-            user=request.user.username
-            newcartitem=stripeshoppingcart(cart_item_username=user,price=PRICE_ID, quantity=QTY,)
-            newcartitem.save()
-            allcartitems=stripeshoppingcart.objects.filter(cart_item_username=user).values()
-            print(allcartitems)
-            allproductsupdated,allprices,producturls=getfreshupdates()
-            return redirect('/cart/',{'allcartitems':allcartitems,'allproductsupdated':allproductsupdated,'allprices':allprices,'producturls':producturls})
-
+          #below is the add product to cart option for a user that is logged in.
+        else:
+         form = addtocart(request.POST)
+           
+        if form.is_valid():
+         PRICE_ID=form.cleaned_data.get('CartPriceID')
+         QTY=form.cleaned_data.get('CartQuantity')
+         print(QTY)
+         user=request.user.username
+         newcartitem=stripeshoppingcart(cart_item_username=user,price=PRICE_ID, quantity=QTY)
+         newcartitem.save()
+         allcartitems=stripeshoppingcart.objects.filter(cart_item_username=user).values()
+         print(allcartitems)
+         allproductsupdated,allprices,producturls=getfreshupdates()
+         return redirect('/cart/',{'allcartitems':allcartitems,'allproductsupdated':allproductsupdated,'allprices':allprices,'producturls':producturls})  
     return render(request,'storefront/buyequipment.html',{'allproductsupdated':allproductsupdated,'allprices':allprices,'producturls':producturls})
+
 
 def buycoffee(request):
     allproductsupdated,allprices,producturls=getfreshupdates()
@@ -186,7 +189,7 @@ def buycoffee(request):
             )
             return redirect(checkout_session.url, code=303)
           #bewlow is the add product to cart option for a user that is logged in.
-        if 'CartPriceID' in request.POST:
+          if 'CartPriceID' in request.POST:
            form = addtocart(request.POST)
            if form.is_valid():
             PRICE_ID=form.cleaned_data.get('CartPriceID')
@@ -265,7 +268,7 @@ def allorders(request):
        if form.is_valid():
         print('form valid')
         shippedorder=form.cleaned_data.get('ShipIt')
-        sendit=stripeorders.objects.get(stripe_order_num=shippedorder)
+        sendit=stripeorders.objects.filter(stripe_order_num=shippedorder)
         print(sendit)
         sendit.stripe_ship_status='SHIPPED'
         sendit.save()   
