@@ -258,18 +258,19 @@ def allorders(request):
        meep=json.dumps(i.shipping)
        ordershipping=json.loads(meep)
        orderid=(i.id)
+       #if order does not exisit in DB, write to DB.
        if not stripeorders.objects.filter(stripe_order_num=orderid).exists():
         neworder=stripeorders(stripe_receipt_url=orderurl,stripe_order_email=orderemail,stripe_shipping_address=ordershipping,stripe_order_num=orderid,stripe_ship_status='PENDING')
         neworder.save()
     
-
+#if post method detected: set shipping status to shipped and pop of the stack.
     if request.method == 'POST':
        form = shipit(request.POST)
        print('in loop')
        if form.is_valid():
         print('form valid')
         shippedorder=form.cleaned_data.get('ShipIt')
-        sendit=stripeorders.objects.filter(stripe_order_num=shippedorder)
+        sendit=stripeorders.objects.get(stripe_order_num=shippedorder)
         print(sendit)
         sendit.stripe_ship_status='SHIPPED'
         sendit.save()   
