@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from stripe import stripe
 import re
 import json
-from .forms import BuyCoffeeNowForm,addtocart
+from .forms import BuyCoffeeNowForm,addtocart,shipit
 from storefront.models import stripeorders,stripeshoppingcart
 
 # Create your views here.
@@ -243,3 +243,32 @@ def cart(request):
        
 
    return render(request,'storefront/cart.html',{'allcartitems':allcartitems,'allproductsupdated':allproductsupdated,'allprices':allprices,'producturls':producturls})  
+
+
+
+def allorders(request):
+    ALL_ORDERS=stripe.Charge.list()
+    for i in ALL_ORDERS.auto_paging_iter():
+       orderurl=(i.receipt_url)
+       orderemail=(i.receipt_email)
+       meep=json.dumps(i.shipping)
+       ordershipping=json.loads(meep)
+       orderid=(i.id)
+       if not stripeorders.objects.filter(stripe_order_num=orderid).exists():
+        neworder=stripeorders(stripe_receipt_url=orderurl,stripe_order_email=orderemail,stripe_shipping_address=ordershipping,stripe_order_num=orderid,stripe_ship_status='PENDING')
+        neworder.save()
+    
+
+    if request.method == 'POST':
+       form = shipit(request.POST)
+       print('in loop')
+       if form.is_valid():
+        print('form valid')
+        shippedorder=form.cleaned_data.get('ShipIt')
+        sendit=stripeorders.objects.get(stripe_order_num=shippedorder)
+        print(sendit)
+        sendit.stripe_ship_status='SHIPPED'
+        sendit.save()   
+
+    pendingorders=stripeorders.objects.filter(stripe_ship_status='PENDING')            
+    return render(request,'storefront/allorders.html',{'pendingorders':pendingorders})

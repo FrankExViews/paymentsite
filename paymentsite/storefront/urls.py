@@ -9,4 +9,5 @@ path('buycoffee/',views.buycoffee, name='buycoffee'),
 path('faq/',views.faq, name='faq'),
 path('about/',views.about, name='about'),
 path('cart/',views.cart, name='cart'),
+path('allorders/',views.allorders, name='allorders'),
 ]

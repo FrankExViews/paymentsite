@@ -1,0 +1,34 @@
+{% extends "storefront/base.html" %}
+{% block content %}
+{% load mathfilters %}
+{% load static %}
+<table class="table">
+    <tr>
+        <th>Order ID</th>
+        <th>EMAIL</th>
+        <th>URL</th>
+        <th>SHIPPING</th>
+        <th>SHIP IT!</th>
+
+    </tr>
+{%for orders in pendingorders%}
+    <tr>
+        <td>{{orders.stripe_order_num}}</td>
+        <td>{{orders.stripe_order_email}}</td>
+        <td><a href="{{orders.stripe_receipt_url}}">RECEIPT LINK</a></td>
+        <td>{{orders.stripe_shipping_address}}</td>
+        <td><form method="post">
+            {% csrf_token %}
+            <input type="hidden" id="ShipIt" name="ShipIt" value="{{orders.stripe_order_num}}">
+            <input type="submit" value="ShipIt">
+           </form>
+        </td>
+
+</tr>
+{%endfor%}
+</table>
+
+
+
+
+{% endblock content %}
