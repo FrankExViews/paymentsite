@@ -250,8 +250,9 @@ def cart(request):
 
 
 def allorders(request):
-    ALL_ORDERS=stripe.Charge.list()
-    for i in ALL_ORDERS.auto_paging_iter():
+    if request.user.is_staff:
+     ALL_ORDERS=stripe.Charge.list()
+     for i in ALL_ORDERS.auto_paging_iter():
        orderurl=(i.receipt_url)
        orderemail=(i.receipt_email)
        meep=json.dumps(i.shipping)
