@@ -189,9 +189,9 @@ def buycoffee(request):
             )
             return redirect(checkout_session.url, code=303)
           #bewlow is the add product to cart option for a user that is logged in.
-          if 'CartPriceID' in request.POST:
-           form = addtocart(request.POST)
-           if form.is_valid():
+        if 'CartPriceID' in request.POST:
+          form = addtocart(request.POST)
+          if form.is_valid():
             PRICE_ID=form.cleaned_data.get('CartPriceID')
             QTY=form.cleaned_data.get('CartQuantity')
             print(QTY)
